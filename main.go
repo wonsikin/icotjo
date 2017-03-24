@@ -10,15 +10,15 @@ import (
 
 const (
 	// AppVersion the version of this app.
-	AppVersion = "v0.0.0"
+	AppVersion = "v0.0.1"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Version = AppVersion
-	app.Name = "i18ncp"
-	app.HelpName = "i18ncp"
-	app.Usage = "a utility for parse i18n.csv to i18n json doc"
+	app.Name = "icotjo"
+	app.HelpName = "icotjo"
+	app.Usage = "a utility for parse i18n.csv to i18n json file"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "input, i",
