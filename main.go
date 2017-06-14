@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/urfave/cli"
-	"github.com/wonsikin/i18n-csv-parser/parser"
+	"github.com/wonsikin/icotjo/parser"
 )
 
 const (
