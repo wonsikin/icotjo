@@ -28,12 +28,17 @@ func main() {
 		cli.StringFlag{
 			Name:  "output, o",
 			Value: "./",
-			Usage: "the output of the swagger file that was generated",
+			Usage: "the output of the json file that was generated",
+		},
+		cli.BoolFlag{
+			Name:   "sort, s",
+			Hidden: false,
+			Usage:  "the input file will be sorted by key if true",
 		},
 	}
 
 	app.Action = func(c *cli.Context) error {
-		err := parser.Parser(c.String("input"), c.String("output"))
+		err := parser.Parser(c.String("input"), c.String("output"), c.Bool("sort"))
 		if err != nil {
 			return fmt.Errorf("%v", err)
 		}
