@@ -22,7 +22,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "input, i",
-			Value: "./i18N.csv",
+			Value: "./I18N.csv",
 			Usage: "where is the i18n.csv file",
 		},
 		cli.StringFlag{
