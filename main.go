@@ -31,14 +31,14 @@ func main() {
 			Usage: "the output of the json file that was generated",
 		},
 		cli.BoolFlag{
-			Name:   "sort, s",
+			Name:   "unsort, u",
 			Hidden: false,
-			Usage:  "the input file will be sorted by key if true",
+			Usage:  "the input file will not be sorted by key if true",
 		},
 	}
 
 	app.Action = func(c *cli.Context) error {
-		err := parser.Parser(c.String("input"), c.String("output"), c.Bool("sort"))
+		err := parser.Parser(c.String("input"), c.String("output"), c.Bool("unsort"))
 		if err != nil {
 			return fmt.Errorf("%v", err)
 		}

@@ -13,7 +13,7 @@ import (
 )
 
 // Parser parser the file and output de result file
-func Parser(input, output string, sorted bool) (err error) {
+func Parser(input, output string, unsorted bool) (err error) {
 	file, err := ReadFile(input)
 	if err != nil {
 		return err
@@ -27,7 +27,7 @@ func Parser(input, output string, sorted bool) (err error) {
 	}
 
 	// sort content by key
-	if sorted {
+	if !unsorted {
 		err = sortInputFile(file.Name(), header, body)
 		if err != nil {
 			fmt.Printf("fail when sorting input file: %v\n", err)
