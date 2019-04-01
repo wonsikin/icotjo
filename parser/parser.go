@@ -18,7 +18,6 @@ func Parser(input, output string, unsorted bool) (err error) {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
 	header, body, err := ReadContent(file)
 	if err != nil {
@@ -26,9 +25,13 @@ func Parser(input, output string, unsorted bool) (err error) {
 		return err
 	}
 
+	fileName := file.Name()
+	// Close file to avoid crash when sort file content
+	file.Close()
+
 	// sort content by key
 	if !unsorted {
-		err = sortInputFile(file.Name(), header, body)
+		err = sortInputFile(fileName, header, body)
 		if err != nil {
 			fmt.Printf("fail when sorting input file: %v\n", err)
 			return err
