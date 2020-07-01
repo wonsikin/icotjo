@@ -29,7 +29,6 @@ steps:
 - task: Go@0
   displayName: 'run test'
   inputs:
-    workingDirectory: '$(modulePath)'
     script: |
         go get github.com/jstemmer/go-junit-report
         go get github.com/axw/gocov/gocov
@@ -44,19 +43,19 @@ steps:
 - task: PublishTestResults@2
   inputs:
     testRunner: JUnit
-    testResultsFiles: $(modulePath)/report.xml
+    testResultsFiles: $(System.DefaultWorkingDirectory)/report.xml
 
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: Cobertura
-    summaryFileLocation: $(modulePath)/coverage.xml
-    reportDirectory: $(modulePath)/coverage
+    summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage.xml
+    reportDirectory: $(System.DefaultWorkingDirectory)/coverage
 
 - task: Go@0
   displayName: 'build app'
   inputs:
     command: 'build'
-    workingDirectory: '$(modulePath)'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
 
 - task: CopyFiles@2
   inputs:
