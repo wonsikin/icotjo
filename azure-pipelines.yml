@@ -2,27 +2,34 @@
 # Build your Go project.
 # Add steps that test, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/go
+pool:
+   vmImage: 'ubuntu-latest'
+
+variables:
+  GOBIN: '$(GOPATH)/bin' # Go binaries path
+  GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
+  modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
 
 trigger: 
  - master
  - dev
 
-pool:
-   vmImage: 'ubuntu-latest'
-
 steps: 
 - task: GoTool@0
   inputs:
     version: '1.12.14'
+
 - task: Go@0
   displayName: 'install dependencies'
   inputs:
     command: 'get'
     arguments: '-d'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
+
 - task: Go@0
   displayName: 'run test'
   inputs:
+    workingDirectory: '$(modulePath)'
     script: |
         go get github.com/jstemmer/go-junit-report
         go get github.com/axw/gocov/gocov
@@ -33,14 +40,28 @@ steps:
         gocov-xml < coverage.json > coverage.xml
         mkdir coverage
         gocov-html < coverage.json > coverage/index.html
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: $(modulePath)/report.xml
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: $(modulePath)/coverage.xml
+    reportDirectory: $(modulePath)/coverage
+
 - task: Go@0
   displayName: 'build app'
   inputs:
     command: 'build'
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
+    workingDirectory: '$(modulePath)'
+
 - task: CopyFiles@2
   inputs:
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
 - task: PublishBuildArtifacts@1
   inputs:
      artifactName: drop
