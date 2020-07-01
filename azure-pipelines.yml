@@ -3,37 +3,45 @@
 # Add steps that test, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/go
 
-trigger:
-- master
+trigger: 
+ - master
+ - dev
 
 pool:
-  vmImage: 'ubuntu-latest'
+   vmImage: 'ubuntu-latest'
 
-variables:
-  GOBIN:  '$(GOPATH)/bin' # Go binaries path
-  GOROOT: '/usr/local/go1.12' # Go installation path
-  GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
-  modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
-
-steps:
-- script: |
-    mkdir -p '$(GOBIN)'
-    mkdir -p '$(GOPATH)/pkg'
-    mkdir -p '$(modulePath)'
-    shopt -s extglob
-    shopt -s dotglob
-    mv !(gopath) '$(modulePath)'
-    echo '##vso[task.prependpath]$(GOBIN)'
-    echo '##vso[task.prependpath]$(GOROOT)/bin'
-  displayName: 'Set up the Go workspace'
-
-- script: |
-    go version
-    go get -v -t -d ./...
-    if [ -f Gopkg.toml ]; then
-        curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-        dep ensure
-    fi
-    go build -v .
-  workingDirectory: '$(modulePath)'
-  displayName: 'Get dependencies, then build'
+steps: 
+- task: GoTool@0
+  inputs:
+    version: '1.12.14'
+- task: Go@0
+  displayName: 'install dependencies'
+  inputs:
+    command: 'get'
+    arguments: '-d'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
+- task: Go@0
+  displayName: 'run test'
+  inputs:
+    script: |
+        go get github.com/jstemmer/go-junit-report
+        go get github.com/axw/gocov/gocov
+        go get github.com/AlekSi/gocov-xml
+        go get -u gopkg.in/matm/v1/gocov-html
+        go test -v -coverprofile=coverage.txt ./... 2>&1 | go-junit-report > report.xml
+        gocov convert coverage.txt > coverage.json
+        gocov-xml < coverage.json > coverage.xml
+        mkdir coverage
+        gocov-html < coverage.json > coverage/index.html
+- task: Go@0
+  displayName: 'build app'
+  inputs:
+    command: 'build'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
+- task: CopyFiles@2
+  inputs:
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+- task: PublishBuildArtifacts@1
+  inputs:
+     artifactName: drop
+        go build -v .
