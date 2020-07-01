@@ -37,7 +37,19 @@ steps:
       mkdir coverage
       $(system.DefaultWorkingDirectory)/gopath/bin/gocov-html < coverage.json > coverage/index.html
 
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/report.xml'
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/coverage'
+
 - task: Go@0
+  displayName: 'Build APP'
   inputs:
     command: 'build'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
